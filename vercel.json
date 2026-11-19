@@ -1,3 +1,6 @@
 {
-  "rewrites": [{ "source": "/((?!api/|assets/|favicon.png|vsl.mp4).*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/confirmado", "destination": "/confirmado.html" },
+    { "source": "/((?!api/|assets/|favicon.png|vsl.mp4|confirmado).*)", "destination": "/index.html" }
+  ]
 }

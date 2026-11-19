@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doação confirmada! Obrigado - Kit Virgem Maria</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content="Sua doação foi confirmada. Obrigado por fazer parte dessa corrente de amor e solidariedade." />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Playfair+Display:wght@500;600;700&display=swap" />
+
+    <style>
+      :root {
+        --navy: #1e3a6e; --blue: #2f5aa8; --sky: #eef3fb; --sky2: #dbe6f7;
+        --gold: #f5b301; --ink: #1f2a44; --muted: #5b6b86; --green: #16a34a;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        font-family: "Montserrat", system-ui, sans-serif; color: var(--ink);
+        background: linear-gradient(180deg, #e9f0fb 0%, #f7faff 38%, #ffffff 100%); min-height: 100vh;
+      }
+      .wrap { max-width: 460px; margin: 0 auto; padding: 22px 16px 48px; }
+      canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+
+      /* Topo */
+      .brand { text-align: center; font-family: "Playfair Display", serif; font-weight: 700; color: var(--navy); font-size: 18px; letter-spacing: .3px; }
+      .brand small { display: block; font-family: "Montserrat", sans-serif; font-weight: 600; font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
+
+      /* Selo animado */
+      .seal { width: 112px; height: 112px; margin: 26px auto 0; position: relative; }
+      .seal .ring { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 30% 25%, #4a7bd0, var(--navy)); box-shadow: 0 14px 34px rgba(30,58,110,.38); animation: pop .6s cubic-bezier(.2,1.4,.4,1) both; }
+      .seal .halo { position: absolute; inset: -10px; border-radius: 50%; border: 2px solid rgba(47,90,168,.35); animation: halo 2.2s ease-out infinite; }
+      .seal svg { position: absolute; inset: 0; margin: auto; width: 56px; height: 56px; }
+      .seal path { stroke: #fff; stroke-width: 6; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 60; stroke-dashoffset: 60; animation: draw .7s .45s ease forwards; }
+      @keyframes pop { from { transform: scale(.2); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+      @keyframes halo { 0% { transform: scale(.9); opacity: .9 } 100% { transform: scale(1.35); opacity: 0 } }
+      @keyframes draw { to { stroke-dashoffset: 0 } }
+
+      h1 { text-align: center; margin-top: 22px; font-size: 27px; line-height: 1.2; font-weight: 900; color: var(--navy); }
+      h1 .nome { color: var(--blue); }
+      .lead { text-align: center; margin: 12px auto 0; max-width: 380px; font-size: 15.5px; line-height: 1.55; color: var(--muted); }
+      .lead b { color: var(--ink); }
+
+      /* Resumo */
+      .card { background: #fff; border: 1px solid var(--sky2); border-radius: 20px; padding: 18px; margin-top: 22px; box-shadow: 0 8px 26px rgba(30,58,110,.08); }
+      .sum { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+      .sum .k { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+      .sum .v { font-size: 26px; font-weight: 900; color: var(--navy); }
+      .pill { display: inline-flex; align-items: center; gap: 6px; background: #dcfce7; color: #166534; font-weight: 800; font-size: 12px; padding: 7px 12px; border-radius: 999px; }
+      .row { display: flex; justify-content: space-between; font-size: 13px; padding-top: 12px; margin-top: 12px; border-top: 1px dashed var(--sky2); color: var(--muted); }
+      .row b { color: var(--ink); }
+
+      /* Corrente */
+      .chain { margin-top: 22px; border-radius: 20px; padding: 20px 18px; text-align: center; color: #fff; background: linear-gradient(135deg, var(--navy), var(--blue)); box-shadow: 0 12px 30px rgba(30,58,110,.32); }
+      .chain h2 { font-family: "Playfair Display", serif; font-size: 21px; line-height: 1.3; }
+      .chain p { margin-top: 8px; font-size: 14px; line-height: 1.55; opacity: .92; }
+
+      h3.sec { margin: 30px 0 4px; text-align: center; font-size: 19px; font-weight: 800; color: var(--navy); }
+      .steps { margin-top: 14px; position: relative; }
+      .step { display: flex; gap: 14px; padding-bottom: 18px; position: relative; }
+      .step:not(:last-child)::before { content: ""; position: absolute; left: 17px; top: 38px; bottom: 2px; width: 2px; background: var(--sky2); }
+      .dot { flex: 0 0 36px; height: 36px; border-radius: 50%; background: var(--sky); color: var(--navy); border: 2px solid var(--sky2); font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+      .step.done .dot { background: var(--green); border-color: var(--green); color: #fff; }
+      .step h4 { font-size: 15px; font-weight: 800; color: var(--ink); }
+      .step p { font-size: 13.5px; line-height: 1.5; color: var(--muted); margin-top: 2px; }
+
+      /* Versículo */
+      .verse { margin-top: 10px; padding: 20px 18px; background: #fff8e6; border: 1px solid #fde7a8; border-radius: 18px; text-align: center; }
+      .verse q { font-family: "Playfair Display", serif; font-size: 18px; line-height: 1.5; color: #5a4300; quotes: none; display: block; }
+      .verse span { display: block; margin-top: 8px; font-size: 12px; font-weight: 700; color: #8a6a00; letter-spacing: 1px; }
+
+      /* Botões */
+      .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; border: 0; border-radius: 14px; padding: 16px; font: 800 15px "Montserrat", sans-serif; text-decoration: none; cursor: pointer; }
+      .btn.primary { color: #fff; background: linear-gradient(180deg, var(--blue), var(--navy)); box-shadow: 0 10px 22px rgba(30,58,110,.3); }
+      .btn.wa { color: #fff; background: #1faa59; box-shadow: 0 10px 22px rgba(31,170,89,.28); }
+      .btn.ghost { color: var(--navy); background: transparent; font-size: 13px; text-decoration: underline; padding: 10px; }
+
+      .share { margin-top: 26px; text-align: center; }
+      .share p { font-size: 14px; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
+
+      /* Oferta */
+      .offer { margin-top: 28px; border: 2px solid var(--sky2); border-radius: 22px; padding: 18px; background: #fff; text-align: center; }
+      .offer .tag { display: inline-block; background: var(--navy); color: #fff; font-size: 11px; font-weight: 800; letter-spacing: 1.2px; padding: 6px 12px; border-radius: 999px; text-transform: uppercase; }
+      .offer img { width: 150px; height: auto; margin: 14px auto 0; display: block; }
+      .offer h3 { margin-top: 12px; font-size: 18px; font-weight: 800; color: var(--navy); }
+      .offer p { margin: 6px 0 14px; font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+      .offer .price { font-size: 24px; font-weight: 900; color: var(--green); margin-bottom: 12px; }
+
+      footer { text-align: center; margin-top: 30px; font-size: 12px; color: var(--muted); line-height: 1.6; }
+      footer b { color: var(--navy); }
+      .fade { opacity: 0; transform: translateY(14px); animation: up .6s ease forwards; }
+      @keyframes up { to { opacity: 1; transform: none } }
+      [hidden] { display: none !important; }
+    </style>
+
+    <!-- Meta Pixel -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1875906393596468');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1875906393596468&ev=PageView&noscript=1" /></noscript>
+
+    <!-- Utmify -->
+    <script>
+      window.pixelId = "6afbbcf3705730e049565bad";
+      var a = document.createElement("script");
+      a.setAttribute("async", ""); a.setAttribute("defer", "");
+      a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+      document.head.appendChild(a);
+    </script>
+    <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
+  </head>
+
+  <body>
+    <canvas id="confetti"></canvas>
+
+    <main class="wrap">
+      <div class="brand fade">Campanha Virgem Maria<small>Missão de Fé e Esperança</small></div>
+
+      <div class="seal">
+        <div class="halo"></div>
+        <div class="ring"></div>
+        <svg viewBox="0 0 56 56" aria-hidden="true"><path d="M13 29 L24 40 L43 18" /></svg>
+      </div>
+
+      <h1 class="fade" style="animation-delay:.2s">Parabéns<span id="comma">,</span> <span class="nome" id="nome"></span>!<br />Sua doação foi confirmada 🙏</h1>
+      <p class="lead fade" style="animation-delay:.3s">
+        Graças ao seu gesto de amor, <b>famílias carentes vão ter um Natal com mais fé, mesa farta e esperança</b>.
+        Que Nossa Senhora abençoe você e toda a sua família!
+      </p>
+
+      <section class="card fade" style="animation-delay:.4s">
+        <div class="sum">
+          <div><div class="k">Valor da doação</div><div class="v" id="valor">R$ --</div></div>
+          <span class="pill">✔ Pagamento confirmado</span>
+        </div>
+        <div class="row"><span>Forma de pagamento</span><b>PIX</b></div>
+        <div class="row" id="rowKit"><span>Seu agradecimento</span><b>Kit Virgem Maria</b></div>
+      </section>
+
+      <section class="chain fade" style="animation-delay:.5s">
+        <h2>Você agora faz parte da corrente de amor ❤️</h2>
+        <p>Cada doação vira itens essenciais entregues por igrejas e instituições parceiras em todo o Brasil. O seu “sim” já está a caminho de quem mais precisa.</p>
+      </section>
+
+      <h3 class="sec">O que acontece agora</h3>
+      <div class="steps">
+        <div class="step done"><div class="dot">✓</div><div><h4>Pagamento confirmado</h4><p>Recebemos a sua doação com sucesso. Muito obrigado!</p></div></div>
+        <div class="step"><div class="dot">2</div><div><h4>Comprovante no seu e-mail</h4><p>Enviaremos o comprovante da sua doação para o e-mail que você informou. Se não encontrar, olhe também a caixa de spam.</p></div></div>
+        <div class="step"><div class="dot">3</div><div><h4>Preparamos o seu Kit Virgem Maria</h4><p>O seu kit personalizado é separado com todo o carinho e enviado para o endereço informado. <b>Envio entre 2 a 5 dias.</b></p></div></div>
+        <div class="step"><div class="dot">4</div><div><h4>Acompanhe o impacto</h4><p>Relatórios de impacto e comprovantes de entrega são compartilhados periodicamente com os doadores cadastrados.</p></div></div>
+      </div>
+
+      <div class="verse fade" style="animation-delay:.6s">
+        <q>“Tudo o que fizestes a um destes meus irmãos mais pequeninos, a mim o fizestes.”</q>
+        <span>MATEUS 25,40</span>
+      </div>
+
+      <section class="share">
+        <p><b>Multiplique o bem:</b> convide um amigo ou familiar para participar dessa corrente. Cada pessoa a mais é uma família a mais abençoada.</p>
+        <a class="btn wa" id="wa" target="_blank" rel="noopener">💬 Compartilhar no WhatsApp</a>
+      </section>
+
+      <!-- Oferta (só aparece para quem ainda não comprou o quadro) -->
+      <section class="offer" id="offer">
+        <span class="tag">🎁 Presente de gratidão</span>
+        <img src="/assets/quadro-nossa-senhora-q6-icbsC.webp" alt="Quadro decorativo de Nossa Senhora Aparecida" width="485" height="780" loading="lazy" />
+        <h3>Quadro Nossa Senhora Aparecida</h3>
+        <p>Leve para sua casa este lindo quadro decorativo e fortaleça sua fé todos os dias. Oferta especial para quem acabou de doar.</p>
+        <div class="price">Apenas R$ 29,90</div>
+        <a class="btn primary" href="/upsell" id="offerBtn">Quero o meu quadro →</a>
+      </section>
+
+      <section class="offer" id="thanksQuadro" hidden>
+        <span class="tag">✔ Quadro garantido</span>
+        <h3 style="margin-top:14px">Seu quadro de Nossa Senhora Aparecida está confirmado!</h3>
+        <p>Ele será enviado em breve para o endereço informado. Que ele traga bênçãos para o seu lar. 🙏</p>
+      </section>
+
+      <div style="text-align:center;margin-top:18px"><a class="btn ghost" href="/">Voltar ao início</a></div>
+
+      <footer>
+        Com gratidão,<br /><b>Equipe Semente da Fé</b><br />
+        “Doar é acolher o próximo e colocar a fé em prática.”
+      </footer>
+    </main>
+
+    <script>
+      (function () {
+        var qs = new URLSearchParams(location.search);
+        var tipo = qs.get('tipo') === 'quadro' ? 'quadro' : 'doacao';
+        var valor = parseFloat(qs.get('valor'));
+        var ref = qs.get('ref') || '';
+        var cliente = null;
+        try { cliente = JSON.parse(sessionStorage.getItem('kvm:cliente') || 'null'); } catch (e) {}
+
+        // Nome (primeiro nome, capitalizado)
+        var nome = '';
+        if (cliente && cliente.name) {
+          nome = String(cliente.name).trim().split(/\s+/)[0];
+          nome = nome.charAt(0).toUpperCase() + nome.slice(1).toLowerCase();
+        }
+        if (nome) document.getElementById('nome').textContent = nome;
+        else { document.getElementById('comma').textContent = ''; document.getElementById('nome').textContent = 'amigo(a) de fé'; document.getElementById('comma').textContent = ','; }
+
+        // Valor
+        if (isFinite(valor) && valor > 0) document.getElementById('valor').textContent = 'R$ ' + valor.toFixed(2).replace('.', ',');
+        else document.getElementById('valor').textContent = 'Obrigado!';
+
+        // Quadro
+        if (tipo === 'quadro') {
+          document.getElementById('offer').hidden = true;
+          document.getElementById('thanksQuadro').hidden = false;
+          document.querySelector('#rowKit b').textContent = 'Quadro Nossa Senhora Aparecida';
+        }
+
+        // WhatsApp
+        var msg = 'Acabei de fazer minha doação na Campanha Virgem Maria 🙏 e ajudar famílias carentes a terem um Natal de esperança. Participe você também dessa corrente de amor: ' + location.origin + '/';
+        document.getElementById('wa').href = 'https://wa.me/?text=' + encodeURIComponent(msg);
+        document.getElementById('wa').addEventListener('click', function () { try { fbq('trackCustom', 'CompartilharWhatsApp'); } catch (e) {} });
+        document.getElementById('offerBtn').addEventListener('click', function () { try { fbq('trackCustom', 'CliqueOfertaQuadro'); } catch (e) {} });
+
+        // Rede de segurança do Purchase: mesma trava/eventID do site (a Meta não conta duas vezes)
+        try {
+          if (ref && isFinite(valor) && valor > 0) {
+            var key = 'kvm:ev:purchase:' + ref;
+            if (!localStorage.getItem(key)) {
+              localStorage.setItem(key, '1');
+              fbq('track', 'Purchase', { value: valor, currency: 'BRL', content_type: 'product', num_items: 1 }, { eventID: 'purchase-' + ref });
+            }
+          }
+          fbq('trackCustom', 'PaginaConfirmado', isFinite(valor) ? { value: valor, currency: 'BRL' } : {});
+        } catch (e) {}
+
+        // Confete
+        try {
+          if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          var c = document.getElementById('confetti'), x = c.getContext('2d'), W, H, dpr = Math.min(window.devicePixelRatio || 1, 2);
+          function size() { W = innerWidth; H = innerHeight; c.width = W * dpr; c.height = H * dpr; x.setTransform(dpr, 0, 0, dpr, 0, 0); }
+          size(); addEventListener('resize', size);
+          var cols = ['#2f5aa8', '#1e3a6e', '#f5b301', '#ffffff', '#7aa5e8', '#ffd866'];
+          var P = [];
+          for (var i = 0; i < 150; i++) P.push({ x: Math.random() * W, y: -20 - Math.random() * H * .6, w: 6 + Math.random() * 7, h: 9 + Math.random() * 9, r: Math.random() * 6.3, vr: (Math.random() - .5) * .25, vy: 2 + Math.random() * 3.2, vx: (Math.random() - .5) * 2.2, c: cols[i % cols.length] });
+          var t0 = performance.now();
+          (function frame(t) {
+            x.clearRect(0, 0, W, H);
+            var alive = 0;
+            P.forEach(function (p) {
+              p.x += p.vx + Math.sin((t + p.y) / 400) * .6; p.y += p.vy; p.r += p.vr;
+              if (p.y < H + 30) alive++;
+              x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.c; x.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); x.restore();
+            });
+            if (alive && t - t0 < 7000) requestAnimationFrame(frame); else x.clearRect(0, 0, W, H);
+          })(t0);
+        } catch (e) {}
+      })();
+    </script>
+  </body>
+</html>
