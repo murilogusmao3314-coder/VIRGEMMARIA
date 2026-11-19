@@ -26,6 +26,27 @@
 
     <script>
       // Integração PIX (PinguPag) - chama as funções /api/pix e /api/status (chave secreta fica no servidor)
+      // Validação dos dados pessoais (CPF com dígito verificador, e-mail e telefone BR)
+      window.kvmValid = {
+        cpf: function (v) {
+          v = String(v || '').replace(/\D/g, '');
+          if (!/^\d{11}$/.test(v) || /^(\d)\1{10}$/.test(v)) return false;
+          for (var t = 9; t <= 10; t++) {
+            var s = 0; for (var i = 0; i < t; i++) s += Number(v[i]) * (t + 1 - i);
+            if (((s * 10) % 11) % 10 !== Number(v[t])) return false;
+          }
+          return true;
+        },
+        email: function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v || '').trim()); },
+        phone: function (v) {
+          v = String(v || '').replace(/\D/g, '');
+          if (v.length < 10 || v.length > 11) return false;
+          if (Number(v.slice(0, 2)) < 11) return false;          // DDD válido (11-99)
+          if (v.length === 11 && v[2] !== '9') return false;     // celular começa com 9
+          return true;
+        },
+        name: function (v) { return /\S+\s+\S+/.test(String(v || '').trim()); }
+      };
       window.kvmPix = async function (body) {
         try {
           try {

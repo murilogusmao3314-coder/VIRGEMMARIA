@@ -33,10 +33,10 @@ module.exports = async (req, res) => {
       document: onlyDigits(c.document),
       phone: onlyDigits(c.phone),
     };
-    if (customer.name.length < 3) return res.status(400).json({ error: 'Informe o nome completo.' });
-    if (!/^\S+@\S+\.\S+$/.test(customer.email)) return res.status(400).json({ error: 'Informe um e-mail válido.' });
+    if (!/\S+\s+\S+/.test(customer.name)) return res.status(400).json({ error: 'Informe o nome completo.' });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(customer.email)) return res.status(400).json({ error: 'Informe um e-mail válido.' });
     if (!validCpf(customer.document)) return res.status(400).json({ error: 'CPF inválido.' });
-    if (customer.phone.length < 10 || customer.phone.length > 11) return res.status(400).json({ error: 'Informe o telefone com DDD.' });
+    if (customer.phone.length < 10 || customer.phone.length > 11 || Number(customer.phone.slice(0, 2)) < 11 || (customer.phone.length === 11 && customer.phone[2] !== '9')) return res.status(400).json({ error: 'Telefone inválido. Informe com DDD.' });
 
     const a = body.address || {};
     const address = {
@@ -66,7 +66,8 @@ module.exports = async (req, res) => {
       const q = qs.toString();
       payload.postback_url = `https://${host}/api/webhook${q ? '?' + q : ''}`;
     }
-    if (address.zipcode) payload.address = address;
+    // Endereço é opcional (CEP errado/ausente não bloqueia o pedido): envia o que o cliente preencheu
+    if (Object.values(address).some(Boolean)) payload.address = address;
     if (Object.keys(tracking).length) payload.tracking = tracking;
 
     const r = await pingupag('/gateway/v1/transaction', { method: 'POST', body: JSON.stringify(payload) });
