@@ -229,6 +229,7 @@
         else document.getElementById('valor').textContent = 'Obrigado!';
 
         // Quadro
+        if (qs.get('oferta') === '0') document.getElementById('offer').hidden = true;
         if (tipo === 'quadro') {
           document.getElementById('offer').hidden = true;
           document.getElementById('thanksQuadro').hidden = false;
