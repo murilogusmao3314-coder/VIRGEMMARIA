@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kit Virgem Maria - Kit Católico Personalizado</title>
+    <meta name="description" content="Faça uma doação para famílias carentes e receba um kit cristão personalizado. Participe dessa corrente de amor e solidariedade.">
+    <meta name="author" content="Semente da Fé" />
+
+    
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7fc516ab-1852-4035-8318-972e50f458ee/id-preview-ea966cdb--b2c753e5-8d35-4642-b5b5-dd414d9dac57.lovable.app-1779917899892.png">
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7fc516ab-1852-4035-8318-972e50f458ee/id-preview-ea966cdb--b2c753e5-8d35-4642-b5b5-dd414d9dac57.lovable.app-1779917899892.png">
+    
+    
+
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Playfair+Display:wght@500;600;700&display=swap" />
+    <link rel="dns-prefetch" href="https://cdn.utmify.com.br" />
+    <link rel="dns-prefetch" href="https://multi.paradisepags.com" />
+
+    <script>
+      window.pixelId = "6afbbcf3705730e049565bad";
+      var a = document.createElement("script");
+      a.setAttribute("async", "");
+      a.setAttribute("defer", "");
+      a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+      document.head.appendChild(a);
+    </script>
+
+
+    <script>
+      // Carrega o one-click.js do ParadisePags de forma tolerante.
+      // Se o servidor responder 403/erro, ignoramos silenciosamente para
+      // não poluir o console nem quebrar a página.
+      (function () {
+        var s = document.createElement('script');
+        s.src = 'https://multi.paradisepags.com/assets/js/one-click.js?v=1765090082';
+        s.defer = true;
+        s.onerror = function () { /* silencioso: 403 ou bloqueio externo */ };
+        document.head.appendChild(s);
+      })();
+    </script>
+    <script src="https://multi.paradisepags.com/assets/js/one-click.js?v=1765090082" defer></script>
+
+    <script
+      src="https://cdn.utmify.com.br/scripts/utms/latest.js"
+      data-utmify-prevent-xcod-sck
+      data-utmify-prevent-subids
+      async
+      defer
+    ></script>
+
+    <meta property="og:title" content="Kit Virgem Maria - Kit Católico Personalizado">
+  <meta name="twitter:title" content="Kit Virgem Maria - Kit Católico Personalizado">
+  <meta property="og:description" content="Faça uma doação para famílias carentes e receba um kit cristão personalizado. Participe dessa corrente de amor e solidariedade.">
+  <meta name="twitter:description" content="Faça uma doação para famílias carentes e receba um kit cristão personalizado. Participe dessa corrente de amor e solidariedade.">
+  <script type="module" crossorigin src="/assets/index-CTp_elVW.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-Bn5gBq1V.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <script>
+      (function () {
+        var UTMS = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid'];
+        try {
+          var params = new URLSearchParams(window.location.search);
+          UTMS.forEach(function (k) {
+            var v = params.get(k);
+            if (v) {
+              try { localStorage.setItem(k, v); } catch (e) {}
+              try { sessionStorage.setItem(k, v); } catch (e) {}
+            }
+          });
+        } catch (e) {}
+
+        function readUtm(k) {
+          try { return localStorage.getItem(k) || sessionStorage.getItem(k); }
+          catch (e) { return null; }
+        }
+
+        window.attachUtmParams = function (href) {
+          try {
+            var url = new URL(href, window.location.origin);
+            UTMS.forEach(function (k) {
+              var v = readUtm(k);
+              if (v && !url.searchParams.get(k)) url.searchParams.set(k, v);
+            });
+            return url.toString();
+          } catch (e) { return href; }
+        };
+
+        function decorateLinks() {
+          document.querySelectorAll('a[href]').forEach(function (link) {
+            try {
+              var url = new URL(link.href);
+              var changed = false;
+              UTMS.forEach(function (k) {
+                var v = readUtm(k);
+                if (v && !url.searchParams.get(k)) {
+                  url.searchParams.set(k, v);
+                  changed = true;
+                }
+              });
+              if (changed) link.href = url.toString();
+            } catch (e) {}
+          });
+        }
+
+        // Initial pass + observe SPA-rendered links
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', decorateLinks);
+        } else {
+          decorateLinks();
+        }
+        try {
+          var mo = new MutationObserver(function () { decorateLinks(); });
+          mo.observe(document.documentElement, { childList: true, subtree: true });
+        } catch (e) {}
+      })();
+    </script>
+  </body>
+</html>
