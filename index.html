@@ -98,6 +98,72 @@
     src="https://www.facebook.com/tr?id=1875906393596468&ev=PageView&noscript=1"
     /></noscript>
     <!-- End Meta Pixel Code -->
+    <!-- Eventos do Meta Pixel (funil completo) -->
+    <script>
+    (function () {
+      var CUR = 'BRL';
+      function ok() { return typeof window.fbq === 'function'; }
+      // Evento padrão do Meta. eid = eventID (deduplicação com a API de Conversões)
+      window.kvmTrack = function (name, params, eid) {
+        try { if (!ok()) return; if (eid) fbq('track', name, params || {}, { eventID: eid }); else fbq('track', name, params || {}); } catch (e) {}
+      };
+      window.kvmTrackCustom = function (name, params) {
+        try { if (ok()) fbq('trackCustom', name, params || {}); } catch (e) {}
+      };
+      // Purchase: dispara uma única vez por transação
+      window.kvmPurchase = function (id, value, name) {
+        try {
+          var key = 'kvm:purchase:' + id;
+          if (sessionStorage.getItem(key)) return;
+          sessionStorage.setItem(key, '1');
+        } catch (e) {}
+        window.kvmTrack('Purchase', { value: value, currency: CUR, content_type: 'product', content_name: name || 'Kit Virgem Maria', num_items: 1 }, 'purchase-' + id);
+      };
+
+      var last = '', first = true;
+      function onRoute() {
+        var path = location.pathname, qs = new URLSearchParams(location.search);
+        var key = path + location.search;
+        if (key === last) return;
+        last = key;
+        if (!first) { try { if (ok()) fbq('track', 'PageView'); } catch (e) {} } // 1º PageView já é disparado pelo pixel
+        first = false;
+        var valor = parseFloat(qs.get('valor'));
+        var has = isFinite(valor) && valor > 0;
+        if (path === '/' || path === '') {
+          window.kvmTrack('ViewContent', { content_name: 'Kit Virgem Maria', content_type: 'product', content_category: 'Doação', currency: CUR });
+        } else if (path.indexOf('/personalizar') === 0) {
+          var p = { currency: CUR, content_type: 'product', content_name: 'Kit Virgem Maria', num_items: 1 };
+          if (has) p.value = valor;
+          window.kvmTrack('AddToCart', p);
+          window.kvmTrack('InitiateCheckout', p);
+          window.kvmTrackCustom('Personalizar', has ? { value: valor, currency: CUR } : {});
+        } else if (path.indexOf('/endereco') === 0) {
+          window.kvmTrackCustom('EnderecoEtapa', has ? { value: valor, currency: CUR } : {});
+        } else if (path.indexOf('/upsell') === 0) {
+          window.kvmTrack('ViewContent', { content_name: 'Quadro Nossa Senhora Aparecida', content_type: 'product', value: 29.9, currency: CUR });
+          window.kvmTrackCustom('UpsellVisto', { value: 29.9, currency: CUR });
+        }
+      }
+      ['pushState', 'replaceState'].forEach(function (m) {
+        var orig = history[m];
+        history[m] = function () { var r = orig.apply(this, arguments); setTimeout(onRoute, 0); return r; };
+      });
+      window.addEventListener('popstate', function () { setTimeout(onRoute, 0); });
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', onRoute); else onRoute();
+
+      // Engajamento (ajuda o pixel a aprender quem é público qualificado)
+      var fired = {};
+      function once(n, f) { if (!fired[n]) { fired[n] = 1; f(); } }
+      window.addEventListener('scroll', function () {
+        var h = document.documentElement, pct = (h.scrollTop + window.innerHeight) / h.scrollHeight * 100;
+        if (pct >= 50) once('s50', function () { window.kvmTrackCustom('Scroll50'); });
+        if (pct >= 90) once('s90', function () { window.kvmTrackCustom('Scroll90'); });
+      }, { passive: true });
+      setTimeout(function () { window.kvmTrackCustom('Tempo30s'); }, 30000);
+      setTimeout(function () { window.kvmTrackCustom('Tempo60s'); }, 60000);
+    })();
+    </script>
 </head>
   <body>
     <div id="root"></div>
