@@ -23,4 +23,4 @@ Depois de salvar, faça um **Redeploy**. Nunca coloque a chave no código.
 - Ao gerar o PIX: envia a venda como `waiting_payment`.
 - `POST /api/webhook` (a URL é enviada automaticamente à PinguPag como `postback_url`): quando o status muda, o servidor **confirma na PinguPag** e envia `paid`, `refunded` ou `chargedback` à Utmify.
 - Sem `UTMIFY_API_TOKEN`, o envio é simplesmente ignorado (o PIX continua funcionando).
-- A taxa do gateway não é informada: a comissão enviada é igual ao valor total.
+- Taxa do gateway considerada: 5,99% + R$ 2,00 por venda (`GATEWAY_FEE_PERCENT` e `GATEWAY_FEE_FIXED_CENTS` permitem ajustar). A comissão enviada = valor − taxa.

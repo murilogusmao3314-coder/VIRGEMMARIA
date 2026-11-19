@@ -2,6 +2,10 @@
 // Token fica SOMENTE no servidor (variável UTMIFY_API_TOKEN). Sem token, o envio é ignorado.
 const UTMIFY_URL = process.env.UTMIFY_BASE_URL || 'https://api.utmify.com.br/api-credentials/orders';
 const PLATFORM = 'KitVirgemMaria';
+// Taxa da PinguPag: 5,99% + R$ 2,00 por venda (ajustável por variável de ambiente)
+const FEE_PERCENT = Number(process.env.GATEWAY_FEE_PERCENT || 5.99);
+const FEE_FIXED_CENTS = Number(process.env.GATEWAY_FEE_FIXED_CENTS || 200);
+const gatewayFee = (amount) => Math.min(amount, Math.round((amount * FEE_PERCENT) / 100) + FEE_FIXED_CENTS);
 
 const pad = (n) => String(n).padStart(2, '0');
 // Date -> "YYYY-MM-DD HH:MM:SS" em UTC
@@ -50,8 +54,7 @@ async function sendOrder({ reference, status, amount, productName, customer, tra
       src: nz(t.src), sck: nz(t.sck), utm_source: nz(t.utm_source), utm_campaign: nz(t.utm_campaign),
       utm_medium: nz(t.utm_medium), utm_content: nz(t.utm_content), utm_term: nz(t.utm_term),
     },
-    // Taxa do gateway não é conhecida aqui: comissão do vendedor = total.
-    commission: { totalPriceInCents: amount, gatewayFeeInCents: 0, userCommissionInCents: amount, currency: 'BRL' },
+    commission: { totalPriceInCents: amount, gatewayFeeInCents: gatewayFee(amount), userCommissionInCents: amount - gatewayFee(amount), currency: 'BRL' },
   };
   try {
     const ctl = new AbortController();
