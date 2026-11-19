@@ -205,6 +205,16 @@
         var cliente = null;
         try { cliente = JSON.parse(sessionStorage.getItem('kvm:cliente') || 'null'); } catch (e) {}
 
+        // Parâmetros de campanha: guarda os que vieram na URL e repassa nos links (início e oferta)
+        var UT = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','sck','fbclid','gclid'];
+        function rd(k) { try { return localStorage.getItem(k) || sessionStorage.getItem(k); } catch (e) { return null; } }
+        UT.forEach(function (k) { var v = qs.get(k); if (v) { try { localStorage.setItem(k, v); sessionStorage.setItem(k, v); } catch (e) {} } });
+        document.querySelectorAll('a[href="/upsell"], a[href="/"]').forEach(function (a) {
+          var u = new URL(a.getAttribute('href'), location.origin);
+          UT.forEach(function (k) { var v = rd(k); if (v) u.searchParams.set(k, v); });
+          a.setAttribute('href', u.pathname + u.search);
+        });
+
         // Nome (primeiro nome, capitalizado)
         var nome = '';
         if (cliente && cliente.name) {

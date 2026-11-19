@@ -30,7 +30,7 @@
         try {
           try {
             var ck = function (n) { var m = document.cookie.match(new RegExp('(?:^|; )' + n + '=([^;]*)')); return m ? decodeURIComponent(m[1]) : ''; };
-            var fbc = ck('_fbc'), fbclid = new URLSearchParams(location.search).get('fbclid');
+            var fbc = ck('_fbc'), fbclid = new URLSearchParams(location.search).get('fbclid') || (function () { try { return localStorage.getItem('fbclid'); } catch (e) { return null; } })();
             if (!fbc && fbclid) fbc = 'fb.1.' + Date.now() + '.' + fbclid;
             body.meta = { fbp: ck('_fbp'), fbc: fbc };
           } catch (e) {}
@@ -186,9 +186,15 @@
     <div id="root"></div>
     <script>
       (function () {
-        var UTMS = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid'];
+        var UTMS = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','sck','fbclid','gclid'];
         try {
           var params = new URLSearchParams(window.location.search);
+          // Se a URL trouxe parâmetros de campanha, eles substituem os antigos (nunca mistura campanhas diferentes)
+          var hasAny = UTMS.some(function (k) { return !!params.get(k); });
+          if (hasAny) UTMS.forEach(function (k) {
+            try { localStorage.removeItem(k); } catch (e) {}
+            try { sessionStorage.removeItem(k); } catch (e) {}
+          });
           UTMS.forEach(function (k) {
             var v = params.get(k);
             if (v) {
@@ -213,6 +219,33 @@
             return url.toString();
           } catch (e) { return href; }
         };
+
+        // Navegação interna (SPA): mantém os parâmetros de campanha em /personalizar, /endereco, /upsell...
+        function keepParams(url) {
+          try {
+            var u = new URL(String(url), window.location.origin);
+            if (u.origin !== window.location.origin) return url;
+            var changed = false;
+            UTMS.forEach(function (k) {
+              if (!u.searchParams.get(k)) {
+                var v = readUtm(k);
+                if (v) { u.searchParams.set(k, v); changed = true; }
+              }
+            });
+            return changed ? u.pathname + u.search + u.hash : url;
+          } catch (e) { return url; }
+        }
+        ['pushState', 'replaceState'].forEach(function (m) {
+          var orig = history[m];
+          history[m] = function (state, title, url) {
+            return orig.call(this, state, title, url == null ? url : keepParams(url));
+          };
+        });
+        // Recarregou / entrou direto numa tela interna: recoloca os parâmetros na URL
+        try {
+          var cur = window.location.pathname + window.location.search + window.location.hash;
+          if (keepParams(cur) !== cur) history.replaceState(history.state, '', cur);
+        } catch (e) {}
 
         function decorateLinks() {
           document.querySelectorAll('a[href]').forEach(function (link) {
