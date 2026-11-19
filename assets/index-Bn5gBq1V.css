@@ -4,3 +4,5 @@
 
 img[src*="campanha-virgem-maria"]{filter:hue-rotate(190deg) saturate(.9)}
 .bg-\[\#2f5aa8\]{background-color:#2f5aa8}
+
+@keyframes kvmPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
