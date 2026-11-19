@@ -25,6 +25,25 @@
     <link rel="dns-prefetch" href="https://multi.paradisepags.com" />
 
     <script>
+      // Integração PIX (PinguPag) - chama as funções /api/pix e /api/status (chave secreta fica no servidor)
+      window.kvmPix = async function (body) {
+        try {
+          var r = await fetch('/api/pix', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+          var d = await r.json().catch(function () { return {}; });
+          if (!r.ok) return { data: null, error: new Error(d.error || 'Não foi possível gerar o PIX.') };
+          return { data: d, error: null };
+        } catch (e) { return { data: null, error: new Error('Falha de conexão. Tente novamente.') }; }
+      };
+      window.kvmPixStatus = async function (id) {
+        try {
+          var r = await fetch('/api/status?id=' + encodeURIComponent(id));
+          if (!r.ok) return { data: null, error: new Error('erro') };
+          return { data: await r.json(), error: null };
+        } catch (e) { return { data: null, error: e }; }
+      };
+    </script>
+
+    <script>
       window.pixelId = "6afbbcf3705730e049565bad";
       var a = document.createElement("script");
       a.setAttribute("async", "");
