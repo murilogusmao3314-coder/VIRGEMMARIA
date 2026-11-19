@@ -125,6 +125,113 @@
     src="https://www.facebook.com/tr?id=1875906393596468&ev=PageView&noscript=1"
     /></noscript>
     <!-- End Meta Pixel Code -->
+    <!-- Pop-up de saída (exit intent) -->
+    <script>
+    (function () {
+      var ALLOWED = ['/', '/personalizar', '/endereco'];
+      var shown = false;
+      function ss(k, v) { try { if (v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); } catch (e) { return null; } }
+      function fb(name) { try { if (typeof window.fbq === 'function') fbq('trackCustom', name); } catch (e) {} }
+
+      function canShow() {
+        if (shown || ss('kvm:exit')) return false;
+        if (ALLOWED.indexOf(location.pathname.replace(/\/+$/, '') || '/') === -1) return false;
+        if (ss('kvm:doacao')) return false;                           // já pagou: não incomoda
+        if (document.querySelector('[data-kvm-pix]')) return false;   // está pagando o PIX
+        if (document.querySelector('[role="dialog"]')) return false;  // outra janela aberta
+        if (Date.now() - t0 < 5000) return false;                     // não nos primeiros segundos
+        return true;
+      }
+      var t0 = Date.now();
+
+      function css() {
+        if (document.getElementById('kvm-exit-css')) return;
+        var s = document.createElement('style'); s.id = 'kvm-exit-css';
+        s.textContent =
+          '#kvm-exit{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(15,27,51,.72);opacity:0;transition:opacity .25s ease}' +
+          '#kvm-exit.on{opacity:1}' +
+          '#kvm-exit .kx{position:relative;width:100%;max-width:400px;background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.45);transform:translateY(18px) scale(.96);transition:transform .3s cubic-bezier(.2,1.2,.4,1);font-family:inherit}' +
+          '#kvm-exit.on .kx{transform:none}' +
+          '#kvm-exit .kx-img{height:150px;background:#1e3a6e center/cover no-repeat;position:relative}' +
+          '#kvm-exit .kx-img:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,58,110,.05) 30%,rgba(30,58,110,.85))}' +
+          '#kvm-exit .kx-tag{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:1;background:#f5b301;color:#2a1d00;font-weight:800;font-size:11px;letter-spacing:1.2px;padding:6px 12px;border-radius:999px;white-space:nowrap}' +
+          '#kvm-exit .kx-x{position:absolute;top:10px;right:10px;z-index:2;width:34px;height:34px;border-radius:17px;border:0;background:rgba(255,255,255,.92);color:#1e3a6e;font-size:20px;line-height:1;cursor:pointer;font-weight:700}' +
+          '#kvm-exit .kx-b{padding:20px 20px 18px;text-align:center}' +
+          '#kvm-exit h2{font-family:"Playfair Display",serif;color:#1e3a6e;font-size:25px;line-height:1.2;font-weight:700}' +
+          '#kvm-exit p{color:#5b6b86;font-size:14.5px;line-height:1.55;margin-top:10px}' +
+          '#kvm-exit p b{color:#1f2a44}' +
+          '#kvm-exit .kx-pts{margin-top:14px;background:#f4f8ff;border:1px solid #dbe6f7;border-radius:14px;padding:10px 12px;text-align:left}' +
+          '#kvm-exit .kx-pts div{font-size:13px;font-weight:600;color:#334155;padding:3px 0}' +
+          '#kvm-exit .kx-cta{display:block;width:100%;margin-top:16px;border:0;border-radius:14px;padding:16px 10px;font-weight:800;font-size:15.5px;font-family:inherit;color:#2a1d00;background:linear-gradient(180deg,#fbc82e,#e8a000);box-shadow:0 10px 24px rgba(232,160,0,.5);cursor:pointer;letter-spacing:.3px}' +
+          '#kvm-exit .kx-no{display:block;margin:12px auto 0;background:none;border:0;color:#64748b;font-weight:700;font-size:13px;font-family:inherit;text-decoration:underline;cursor:pointer}' +
+          '#kvm-exit .kx:focus{outline:none}#kvm-exit .kx-cta:focus-visible,#kvm-exit .kx-no:focus-visible,#kvm-exit .kx-x:focus-visible{outline:3px solid #1e3a6e;outline-offset:2px}' +
+          '#kvm-exit .kx-s{margin-top:10px;font-size:11px;color:#94a3b8}' +
+          '@media (prefers-reduced-motion:reduce){#kvm-exit,#kvm-exit .kx{transition:none}}';
+        document.head.appendChild(s);
+      }
+
+      function open() {
+        if (!canShow()) return;
+        shown = true; ss('kvm:exit', '1'); css();
+        var home = (location.pathname.replace(/\/+$/, '') || '/') === '/';
+        var el = document.createElement('div');
+        el.id = 'kvm-exit'; el.setAttribute('role', 'alertdialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'kx-t');
+        el.innerHTML =
+          '<div class="kx">' +
+            '<button class="kx-x" type="button" aria-label="Fechar">×</button>' +
+            '<div class="kx-img" style="background-image:url(/assets/kit-novembro-3-foto-1-Rfr7Tutd.webp)"><span class="kx-tag">🙏 ESPERE UM POUCO</span></div>' +
+            '<div class="kx-b">' +
+              (home
+                ? '<h2 id="kx-t">Uma família conta com você neste Natal</h2>' +
+                  '<p>Com a sua doação, famílias carentes recebem <b>alimento e esperança</b>. E, em gratidão, você ainda recebe o <b>Kit Virgem Maria</b>. Dá para ajudar em menos de 2 minutos.</p>' +
+                  '<div class="kx-pts"><div>✓ Doe a partir de R$ 30 via PIX</div><div>✓ Receba o Kit Virgem Maria em agradecimento</div><div>✓ Cada doação vira itens essenciais para quem precisa</div></div>' +
+                  '<button class="kx-cta" type="button" data-go>❤️ QUERO AJUDAR AGORA</button>'
+                : '<h2 id="kx-t">Falta só um passo para ajudar</h2>' +
+                  '<p>Sua doação está <b>quase pronta</b>. Conclua agora e ajude uma família a ter um Natal com mais fé, mesa farta e esperança. Leva menos de 2 minutos.</p>' +
+                  '<button class="kx-cta" type="button" data-go>🙏 CONTINUAR MINHA DOAÇÃO</button>') +
+              '<button class="kx-no" type="button" data-no>Agora não</button>' +
+              '<div class="kx-s">🔒 Pagamento seguro via PIX</div>' +
+            '</div>' +
+          '</div>';
+        document.body.appendChild(el);
+        var prev = document.body.style.overflow; document.body.style.overflow = 'hidden';
+        requestAnimationFrame(function () { el.classList.add('on'); });
+        fb('ExitPopupVisto');
+
+        function close(evt) {
+          document.removeEventListener('keydown', onKey, true);
+          document.body.style.overflow = prev;
+          el.classList.remove('on');
+          setTimeout(function () { el.parentNode && el.parentNode.removeChild(el); }, 260);
+          if (evt) fb(evt);
+        }
+        function onKey(e) { if (e.key === 'Escape') close('ExitPopupFechou'); }
+        document.addEventListener('keydown', onKey, true);
+        el.addEventListener('click', function (e) {
+          if (e.target === el) return close('ExitPopupFechou');
+          if (e.target.closest('.kx-x') || e.target.closest('[data-no]')) return close('ExitPopupFechou');
+          if (e.target.closest('[data-go]')) {
+            close('ExitPopupCliqueAjudar');
+            if (home) { var p = document.getElementById('produto'); p && p.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+          }
+        });
+        var box = el.querySelector('.kx'); box.setAttribute('tabindex', '-1'); box.focus({ preventScroll: true });
+      }
+
+      // Computador: o mouse sai da janela pela parte de cima (indo para abas, favoritos ou fechar)
+      document.addEventListener('mouseout', function (e) {
+        if (!e.relatedTarget && e.clientY <= 0) open();
+      });
+      // Celular: rolagem rápida para cima (gesto típico de quem vai à barra de endereço / voltar)
+      var lastY = window.scrollY, lastT = Date.now();
+      window.addEventListener('scroll', function () {
+        var y = window.scrollY, t = Date.now(), dy = lastY - y, dt = Math.max(1, t - lastT);
+        if (dy >= 500 && dy / dt > 1.5 && 'ontouchstart' in window) open();
+        lastY = y; lastT = t;
+      }, { passive: true });
+    })();
+    </script>
+
     <!-- Eventos do Meta Pixel (funil completo, sem duplicar) -->
     <script>
     (function () {
@@ -209,9 +316,18 @@
       (function () {
         var UTMS = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','sck','fbclid','gclid'];
         try {
+          // Parâmetros salvos no navegador valem por 30 dias (quem volta depois mantém a origem da campanha)
+          try {
+            var ts = Number(localStorage.getItem('kvm:utm_ts') || 0);
+            if (ts && Date.now() - ts > 30 * 864e5) {
+              UTMS.forEach(function (k) { try { localStorage.removeItem(k); sessionStorage.removeItem(k); } catch (e) {} });
+              localStorage.removeItem('kvm:utm_ts');
+            }
+          } catch (e) {}
           var params = new URLSearchParams(window.location.search);
           // Se a URL trouxe parâmetros de campanha, eles substituem os antigos (nunca mistura campanhas diferentes)
           var hasAny = UTMS.some(function (k) { return !!params.get(k); });
+          if (hasAny) { try { localStorage.setItem('kvm:utm_ts', String(Date.now())); } catch (e) {} }
           if (hasAny) UTMS.forEach(function (k) {
             try { localStorage.removeItem(k); } catch (e) {}
             try { sessionStorage.removeItem(k); } catch (e) {}
