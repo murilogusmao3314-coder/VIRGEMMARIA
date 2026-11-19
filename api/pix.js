@@ -54,7 +54,18 @@ module.exports = async (req, res) => {
     const reference = `KVM-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const host = req.headers['x-forwarded-host'] || req.headers.host;
     const payload = { amount, description, reference, source: 'api_externa', customer };
-    if (host && !/^localhost|^127\./.test(host)) payload.postback_url = `https://${host}/api/webhook`;
+    if (host && !/^localhost|^127\./.test(host)) {
+      // Dados de atribuição viajam na URL do webhook (sem banco de dados) para a API de Conversões da Meta.
+      const m = body.meta || {};
+      const qs = new URLSearchParams();
+      if (/^fb\.\d\.\d+\.\d+$/.test(m.fbp || '')) qs.set('fbp', m.fbp);
+      if (/^fb\.\d\.\d+\.[\w-]+$/.test(m.fbc || '')) qs.set('fbc', m.fbc);
+      const cip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+      if (cip) qs.set('ip', cip);
+      if (req.headers['user-agent']) qs.set('ua', String(req.headers['user-agent']).slice(0, 300));
+      const q = qs.toString();
+      payload.postback_url = `https://${host}/api/webhook${q ? '?' + q : ''}`;
+    }
     if (address.zipcode) payload.address = address;
     if (Object.keys(tracking).length) payload.tracking = tracking;
 

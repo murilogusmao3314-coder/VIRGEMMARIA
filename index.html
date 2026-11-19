@@ -28,6 +28,12 @@
       // Integração PIX (PinguPag) - chama as funções /api/pix e /api/status (chave secreta fica no servidor)
       window.kvmPix = async function (body) {
         try {
+          try {
+            var ck = function (n) { var m = document.cookie.match(new RegExp('(?:^|; )' + n + '=([^;]*)')); return m ? decodeURIComponent(m[1]) : ''; };
+            var fbc = ck('_fbc'), fbclid = new URLSearchParams(location.search).get('fbclid');
+            if (!fbc && fbclid) fbc = 'fb.1.' + Date.now() + '.' + fbclid;
+            body.meta = { fbp: ck('_fbp'), fbc: fbc };
+          } catch (e) {}
           var r = await fetch('/api/pix', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
           var d = await r.json().catch(function () { return {}; });
           if (!r.ok) return { data: null, error: new Error(d.error || 'Não foi possível gerar o PIX.') };
@@ -98,51 +104,65 @@
     src="https://www.facebook.com/tr?id=1875906393596468&ev=PageView&noscript=1"
     /></noscript>
     <!-- End Meta Pixel Code -->
-    <!-- Eventos do Meta Pixel (funil completo) -->
+    <!-- Eventos do Meta Pixel (funil completo, sem duplicar) -->
     <script>
     (function () {
-      var CUR = 'BRL';
+      var CUR = 'BRL', mem = {};
       function ok() { return typeof window.fbq === 'function'; }
-      // Evento padrão do Meta. eid = eventID (deduplicação com a API de Conversões)
-      window.kvmTrack = function (name, params, eid) {
-        try { if (!ok()) return; if (eid) fbq('track', name, params || {}, { eventID: eid }); else fbq('track', name, params || {}); } catch (e) {}
-      };
-      window.kvmTrackCustom = function (name, params) {
-        try { if (ok()) fbq('trackCustom', name, params || {}); } catch (e) {}
-      };
-      // Purchase: dispara uma única vez por transação
-      window.kvmPurchase = function (id, value, name) {
+      // Trava: devolve true só na 1ª vez (por sessão do navegador; "persist" = permanente neste navegador)
+      function first(key, persist) {
         try {
-          var key = 'kvm:purchase:' + id;
-          if (sessionStorage.getItem(key)) return;
-          sessionStorage.setItem(key, '1');
-        } catch (e) {}
-        window.kvmTrack('Purchase', { value: value, currency: CUR, content_type: 'product', content_name: name || 'Kit Virgem Maria', num_items: 1 }, 'purchase-' + id);
+          var st = persist ? localStorage : sessionStorage;
+          if (st.getItem('kvm:ev:' + key)) return false;
+          st.setItem('kvm:ev:' + key, '1'); return true;
+        } catch (e) { if (mem[key]) return false; mem[key] = 1; return true; }
+      }
+      var sid; try { sid = sessionStorage.getItem('kvm:sid'); if (!sid) { sid = Math.random().toString(36).slice(2, 10); sessionStorage.setItem('kvm:sid', sid); } } catch (e) { sid = 'x'; }
+      // Evento padrão, sempre com eventID (deduplicação na Meta) e uma única vez por "key"
+      function std(key, name, params, eid, persist) {
+        if (!first(key, persist)) return;
+        try { if (ok()) fbq('track', name, params || {}, { eventID: eid || (name + '-' + sid + '-' + key) }); } catch (e) {}
+      }
+      function custom(key, name, params) {
+        if (!first(key)) return;
+        try { if (ok()) fbq('trackCustom', name, params || {}); } catch (e) {}
+      }
+      // Compra: 1 única vez por venda, mesmo em outra aba/recarregando. eventID = o mesmo usado no servidor (API de Conversões).
+      window.kvmPurchase = function (reference, value, name) {
+        std('purchase:' + reference, 'Purchase', { value: value, currency: CUR, content_type: 'product', content_name: name || 'Kit Virgem Maria', num_items: 1 }, 'purchase-' + reference, true);
       };
+      window.kvmPixGenerated = function (id, value) {
+        custom('pixgen:' + id, 'PixGerado', { value: value, currency: CUR });
+        std('pay:' + value, 'AddPaymentInfo', { value: value, currency: CUR, content_type: 'product' });
+        std('lead:' + value, 'Lead', { value: value, currency: CUR, content_name: 'Kit Virgem Maria' });
+      };
+      window.kvmPixCopied = function (id, value) { custom('pixcopy:' + id, 'PixCopiado', { value: value, currency: CUR }); };
+      window.kvmFinalizeClick = function (value) { custom('fin:' + value, 'FinalizarClick', { value: value, currency: CUR }); };
 
-      var last = '', first = true;
+      var lastPath = null, lastKey = '', lastAt = 0;
       function onRoute() {
-        var path = location.pathname, qs = new URLSearchParams(location.search);
-        var key = path + location.search;
-        if (key === last) return;
-        last = key;
-        if (!first) { try { if (ok()) fbq('track', 'PageView'); } catch (e) {} } // 1º PageView já é disparado pelo pixel
-        first = false;
-        var valor = parseFloat(qs.get('valor'));
-        var has = isFinite(valor) && valor > 0;
+        var path = location.pathname || '/', qs = new URLSearchParams(location.search);
+        var valor = parseFloat(qs.get('valor')), has = isFinite(valor) && valor > 0;
+        var key = path + '|' + (has ? valor : '');
+        var now = Date.now();
+        if (key === lastKey && now - lastAt < 2000) return; // pushState + replaceState seguidos = 1 só
+        lastKey = key; lastAt = now;
+        if (lastPath !== null && path !== lastPath) { try { if (ok()) fbq('track', 'PageView'); } catch (e) {} } // 1º PageView é do próprio pixel
+        if (lastPath === path) return; // mudou só a query: não repete eventos
+        lastPath = path;
         if (path === '/' || path === '') {
-          window.kvmTrack('ViewContent', { content_name: 'Kit Virgem Maria', content_type: 'product', content_category: 'Doação', currency: CUR });
+          std('vc:home', 'ViewContent', { content_name: 'Kit Virgem Maria', content_type: 'product', content_category: 'Doação', currency: CUR });
         } else if (path.indexOf('/personalizar') === 0) {
           var p = { currency: CUR, content_type: 'product', content_name: 'Kit Virgem Maria', num_items: 1 };
           if (has) p.value = valor;
-          window.kvmTrack('AddToCart', p);
-          window.kvmTrack('InitiateCheckout', p);
-          window.kvmTrackCustom('Personalizar', has ? { value: valor, currency: CUR } : {});
+          std('atc:' + valor, 'AddToCart', p);
+          std('ic:' + valor, 'InitiateCheckout', p);
+          custom('pers:' + valor, 'Personalizar', has ? { value: valor, currency: CUR } : {});
         } else if (path.indexOf('/endereco') === 0) {
-          window.kvmTrackCustom('EnderecoEtapa', has ? { value: valor, currency: CUR } : {});
+          custom('end:' + valor, 'EnderecoEtapa', has ? { value: valor, currency: CUR } : {});
         } else if (path.indexOf('/upsell') === 0) {
-          window.kvmTrack('ViewContent', { content_name: 'Quadro Nossa Senhora Aparecida', content_type: 'product', value: 29.9, currency: CUR });
-          window.kvmTrackCustom('UpsellVisto', { value: 29.9, currency: CUR });
+          std('vc:upsell', 'ViewContent', { content_name: 'Quadro Nossa Senhora Aparecida', content_type: 'product', value: 29.9, currency: CUR });
+          custom('upsell', 'UpsellVisto', { value: 29.9, currency: CUR });
         }
       }
       ['pushState', 'replaceState'].forEach(function (m) {
@@ -152,16 +172,13 @@
       window.addEventListener('popstate', function () { setTimeout(onRoute, 0); });
       if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', onRoute); else onRoute();
 
-      // Engajamento (ajuda o pixel a aprender quem é público qualificado)
-      var fired = {};
-      function once(n, f) { if (!fired[n]) { fired[n] = 1; f(); } }
       window.addEventListener('scroll', function () {
-        var h = document.documentElement, pct = (h.scrollTop + window.innerHeight) / h.scrollHeight * 100;
-        if (pct >= 50) once('s50', function () { window.kvmTrackCustom('Scroll50'); });
-        if (pct >= 90) once('s90', function () { window.kvmTrackCustom('Scroll90'); });
+        var d = document.documentElement, pct = (d.scrollTop + window.innerHeight) / d.scrollHeight * 100;
+        if (pct >= 50) custom('s50', 'Scroll50');
+        if (pct >= 90) custom('s90', 'Scroll90');
       }, { passive: true });
-      setTimeout(function () { window.kvmTrackCustom('Tempo30s'); }, 30000);
-      setTimeout(function () { window.kvmTrackCustom('Tempo60s'); }, 60000);
+      setTimeout(function () { custom('t30', 'Tempo30s'); }, 30000);
+      setTimeout(function () { custom('t60', 'Tempo60s'); }, 60000);
     })();
     </script>
 </head>

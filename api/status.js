@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
   try {
     const r = await pingupag(`/gateway/v1/query?action=get_transaction&id=${encodeURIComponent(id)}`);
     if (!r.ok) return res.status(502).json({ error: 'Falha ao consultar o pagamento.' });
-    return res.status(200).json({ status: (r.data && r.data.status) || 'pending' });
+    return res.status(200).json({ status: (r.data && r.data.status) || 'pending', reference: (r.data && r.data.external_id) || null });
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: 'Erro ao consultar o pagamento.' });

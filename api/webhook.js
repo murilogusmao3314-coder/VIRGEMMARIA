@@ -2,6 +2,7 @@
 // Não confiamos no corpo: confirmamos o status direto na API da PinguPag antes de avisar a Utmify.
 const { pingupag, readBody } = require('./_pingupag');
 const { sendOrder, brasiliaToDate } = require('./_utmify');
+const { sendPurchase } = require('./_meta');
 
 const STATUS_MAP = { approved: 'paid', refunded: 'refunded', chargeback: 'chargedback', failed: 'refused' };
 
@@ -24,14 +25,25 @@ module.exports = async (req, res) => {
     const c = p.customer || (real.customer_data && real.customer_data.customer) || {};
     const amount = Number(real.amount) || Number(p.amount);
     const now = new Date();
-    await sendOrder({
-      reference, status, amount,
-      productName: (p.product && p.product.name) || 'Doação Kit Virgem Maria',
-      customer: { name: c.name || 'Cliente', email: c.email || 'sem-email@exemplo.com', phone: c.phone, document: c.document },
+    const productName = (p.product && p.product.name) || 'Doação Kit Virgem Maria';
+    const customer = { name: c.name || 'Cliente', email: c.email || 'sem-email@exemplo.com', phone: c.phone, document: c.document };
+    // Data estável do pagamento (a mesma em reenvios do webhook): usa a da própria transação.
+    const paidAt = brasiliaToDate(real.updated_at || p.timestamp);
+    const jobs = [sendOrder({
+      reference, status, amount, productName, customer,
       tracking: p.tracking || (real.customer_data && real.customer_data.tracking) || {},
-      approvedDate: status === 'paid' || status === 'refunded' || status === 'chargedback' ? brasiliaToDate(p.timestamp) : null,
+      approvedDate: status === 'paid' || status === 'refunded' || status === 'chargedback' ? paidAt : null,
       refundedAt: status === 'refunded' ? now : null,
-    });
+    })];
+    if (status === 'paid') {
+      const qy = req.query || {};
+      const host = req.headers['x-forwarded-host'] || req.headers.host;
+      jobs.push(sendPurchase({
+        reference, amount, productName, customer, address: p.address,
+        fbp: qy.fbp, fbc: qy.fbc, ip: qy.ip, ua: qy.ua, sourceUrl: host ? `https://${host}/` : undefined, eventTime: paidAt,
+      }));
+    }
+    await Promise.all(jobs);
     return res.status(200).json({ ok: true });
   } catch (e) {
     console.error(e);
