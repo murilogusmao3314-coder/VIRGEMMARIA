@@ -1,5 +1,6 @@
 // POST /api/pix  -> cria uma cobrança PIX na PinguPag e devolve o QR Code / copia e cola.
 const { pingupag, onlyDigits, validCpf, readBody } = require('./_pingupag');
+const { sendOrder } = require('./_utmify');
 
 // Valores de doação permitidos (em reais). O valor NUNCA é aceito livremente do navegador.
 const DONATION_VALUES = [20, 30, 40, 60, 100, 150, 250, 500, 1000, 1500];
@@ -51,7 +52,9 @@ module.exports = async (req, res) => {
     });
 
     const reference = `KVM-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
     const payload = { amount, description, reference, source: 'api_externa', customer };
+    if (host && !/^localhost|^127\./.test(host)) payload.postback_url = `https://${host}/api/webhook`;
     if (address.zipcode) payload.address = address;
     if (Object.keys(tracking).length) payload.tracking = tracking;
 
@@ -61,6 +64,9 @@ module.exports = async (req, res) => {
       console.error('PinguPag erro', r.status, JSON.stringify(d).slice(0, 500));
       return res.status(502).json({ error: d.message || d.error || 'Não foi possível gerar o PIX. Tente novamente.' });
     }
+    // Utmify: venda criada, aguardando pagamento (não bloqueia o PIX se falhar)
+    const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || undefined;
+    await sendOrder({ reference, status: 'waiting_payment', amount, productName: description, customer, tracking, ip });
     return res.status(200).json({
       transaction_id: d.transaction_id,
       reference,
