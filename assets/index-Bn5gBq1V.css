@@ -12,3 +12,10 @@ img[src*="campanha-virgem-maria"]{filter:hue-rotate(190deg) saturate(.9)}
 .kvm-cta:hover{filter:brightness(1.05)}
 .kvm-cta *{color:inherit!important}
 .kvm-off{background-image:none!important;background-color:#e2e8f0!important;color:#94a3b8!important;box-shadow:none!important}
+
+/* Home: âncoras com espaço para o cabeçalho fixo; produtos em 2 colunas compactos */
+#valores,#impactos,#produto{scroll-margin-top:84px}
+html{scroll-behavior:smooth}
+.kvm-prod h4{font-size:13px!important;line-height:1.25!important}
+.kvm-prod p{font-size:11px!important;line-height:1.35!important}
+.kvm-prod article>div{padding:10px 10px 12px!important}
